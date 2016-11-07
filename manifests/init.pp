@@ -38,11 +38,21 @@ class infiniband (
     content => template('infiniband/rdma.conf.erb'),
     require => Package['rdma'],
   }
-  service { 'rdma':
-    ensure    => running,
-    enable    => true,
-    provider  => redhat,
-    require   => File['/etc/rdma/rdma.conf'],
-    subscribe => File['/etc/rdma/rdma.conf'],
+  if $facts['os']['release']['major'] == '7' {
+    service { 'rdma':
+      ensure    => running,
+      enable    => true,
+      provider  => systemd,
+      require   => File['/etc/rdma/rdma.conf'],
+      subscribe => File['/etc/rdma/rdma.conf'],
+    }
+  } else {
+    service { 'rdma':
+      ensure    => running,
+      enable    => true,
+      provider  => redhat,
+      require   => File['/etc/rdma/rdma.conf'],
+      subscribe => File['/etc/rdma/rdma.conf'],
+    }
   }
 }
